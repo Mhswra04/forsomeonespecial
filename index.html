@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>untuk ara.</title>
+    <style>
+        :root {
+            --bg-deep: #0b0d17;
+            --bg-warm: #fdfbf7;
+            --text-main: #4a4543;
+            --accent: #b07d62;
+            --star-color: #f3e5ab;
+            --soft-blue: #1a1c2c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Background Stars & Sky --- */
+        #sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #0b0d17 0%, #1a1c2c 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* --- Waves --- */
+        .waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh;
+            min-height: 100px;
+            max-height: 150px;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        /* --- Layout --- */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Hero --- */
+        #hero h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            color: var(--star-color);
+        }
+
+        #hero p {
+            font-size: 1.1rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: lowercase;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--star-color);
+        }
+
+        /* --- Envelope & Letter --- */
+        #letter-section {
+            display: none;
+            padding-top: 5rem;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #d1b8a5;
+            margin: 0 auto 2rem auto;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .envelope-wrapper.open {
+            transform: translateY(100px);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #c2a691;
+            z-index: 3;
+            transform-origin: top;
+            transition: transform 0.5s 0.2s;
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .letter-content {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            width: 280px;
+            height: 180px;
+            background: var(--bg-warm);
+            z-index: 2;
+            padding: 1rem;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            text-align: left;
+            overflow: hidden;
+            transition: all 0.5s 0.5s;
+        }
+
+        .envelope-wrapper.open .letter-content {
+            height: auto;
+            min-height: 400px;
+            top: -300px;
+            z-index: 5;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .full-letter-view {
+            max-width: 600px;
+            background: var(--bg-warm);
+            color: var(--text-main);
+            padding: 3rem 2rem;
+            border-radius: 4px;
+            text-align: left;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-bottom: 5rem;
+        }
+
+        .typewriter-text {
+            white-space: pre-line;
+            font-size: 1.1rem;
+            min-height: 100px;
+        }
+
+        /* --- Wishes --- */
+        .wish-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 3rem;
+        }
+
+        .wish-card {
+            background: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: left;
+        }
+
+        .wish-num {
+            font-family: serif;
+            font-size: 0.8rem;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 1rem;
+            letter-spacing: 0.2em;
+        }
+
+        /* --- Chips --- */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 700px;
+            margin-top: 2rem;
+        }
+
+        .chip {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .chip:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--star-color);
+        }
+
+        /* --- Adore List --- */
+        .adore-list {
+            list-style: none;
+            text-align: left;
+            max-width: 400px;
+            margin-top: 2rem;
+        }
+
+        .adore-list li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .adore-list li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* --- Modal --- */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        #modal-content {
+            background: var(--bg-warm);
+            color: var(--text-main);
+            padding: 2rem;
+            max-width: 400px;
+            border-radius: 4px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            text-transform: lowercase;
+        }
+
+        /* --- Canvas Confetti --- */
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            body { background: white; color: black; }
+            #sky, .waves, .controls, .btn, #hero, .chips-container, #confetti { display: none !important; }
+            section { min-height: auto; opacity: 1 !important; transform: none !important; display: block !important; padding: 0; }
+            .full-letter-view { display: block !important; box-shadow: none; margin: 0; padding: 0; max-width: 100%; }
+            .wish-grid { display: block; }
+            .wish-card { border: none; margin-bottom: 2rem; padding: 0; }
+        }
+
+        @media (max-width: 768px) {
+            #hero h1 { font-size: 1.8rem; }
+            .full-letter-view { font-size: 0.95rem; }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+
+    <div id="sky"></div>
+
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+    <defs>
+    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+    </defs>
+    <g class="parallax">
+    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+    </g>
+    </svg>
+
+    <div class="controls">
+        <button class="control-btn" onclick="toggleAmbience()" id="ambienceToggle">ambience: on</button>
+        <button class="control-btn" onclick="window.print()">save this moment</button>
+    </div>
+
+    <section id="hero" class="visible">
+        <p class="lowercase" style="letter-spacing: 0.3em; font-size: 0.7rem; margin-bottom: 0.5rem; opacity: 0.6;">for my favorite human</p>
+        <h1>happy birthday, ara.</h1>
+        <p>december 17, 2025</p>
+        <button class="btn" onclick="openLetter()">open the letter</button>
+    </section>
+
+    <section id="letter-section">
+        <div class="full-letter-view" id="full-letter">
+            <div id="typewriter" class="typewriter-text"></div>
+            <div style="margin-top: 2rem; text-align: right;">
+                <button class="btn" id="skipBtn" onclick="skipTypewriter()" style="color: var(--text-main); border-color: var(--accent); font-size: 0.7rem;">skip</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="rest-section">
+        <h2 class="serif italic" style="font-size: 1.8rem; margin-bottom: 1.5rem;">a soft place to land.</h2>
+        <p style="max-width: 600px; opacity: 0.9;">
+            kalau suatu saat kamu ngerasa dunia terlalu ramai, kamu boleh pilih sunyi. kamu boleh menghilang sebentar. kamu boleh narik garis, kamu boleh jagain hatimu dulu. i’m always a chat away, tapi ga apa-apa kalau kamu lagi butuh jarak buat bernapas. take all the time u need.
+        </p>
+    </section>
+
+    <section id="wishes-section">
+        <h2 class="serif italic">my little wishes for u:</h2>
+        <div class="wish-grid">
+            <div class="wish-card">
+                <span class="wish-num">01</span>
+                <p>tidur yang nyenyak, tanpa mimpi-mimpi yang bikin cape, dan bangun dengan dada yang lebih ringan.</p>
+            </div>
+            <div class="wish-card">
+                <span class="wish-num">02</span>
+                <p>enough courage to say “no” to things that drain your soul—tanpa rasa bersalah, tanpa perlu jelasin panjang-panjang.</p>
+            </div>
+            <div class="wish-card">
+                <span class="wish-num">03</span>
+                <p>setiap kali kamu merasa “kecil”, semoga ada hal sederhana yang nyamperin kamu pelan-pelan dan ngingetin: kamu berharga. kamu cukup. kamu layak disayang.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="reminders-section">
+        <h2 class="serif italic">little reminders</h2>
+        <div class="chips-container">
+            <div class="chip" onclick="showReminder(0)">you’re allowed to rest</div>
+            <div class="chip" onclick="showReminder(1)">you don’t have to be perfect</div>
+            <div class="chip" onclick="showReminder(2)">small steps still count</div>
+            <div class="chip" onclick="showReminder(3)">your feelings make sense</div>
+            <div class="chip" onclick="showReminder(4)">you’re not alone</div>
+            <div class="chip" onclick="showReminder(5)">breathe… again</div>
+        </div>
+    </section>
+
+    <section id="adore-section">
+        <h2 class="serif italic">things i adore about u</h2>
+        <ul class="adore-list">
+            <li>gimana kamu selalu coba buat ngertiin orang lain.</li>
+            <li>cara kamu ketawa pas lagi benar-benar senang.</li>
+            <li>ketenangan yang kamu bawa tiap kali kita ngobrol.</li>
+            <li>kejujuranmu soal hal-hal yang bikin kamu takut.</li>
+            <li>gimana kamu ga pernah nyerah buat jadi orang baik.</li>
+            <li>semua hobi kecil yang bikin matamu berbinar.</li>
+            <li>keberanianmu buat tetap ada, meski lagi ga baik-baik aja.</li>
+        </ul>
+    </section>
+
+    <section id="closing" style="padding-bottom: 10rem;">
+        <h2 class="serif italic" style="margin-bottom: 2rem;">happy birthday, human.</h2>
+        <p style="opacity: 0.7; margin-bottom: 3rem; font-size: 0.9rem;">thank u for being exactly who u are.</p>
+        <button class="btn" onclick="sendWish()">send a tiny wish</button>
+    </section>
+
+    <div id="modal" onclick="closeModal()">
+        <div id="modal-content" onclick="event.stopPropagation()">
+            <p id="modal-text"></p>
+            <button class="btn" onclick="closeModal()" style="color: var(--text-main); border-color: var(--accent); margin-top: 1.5rem; font-size: 0.8rem;">close</button>
+        </div>
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <script>
+        // --- Star Generation ---
+        const sky = document.getElementById('sky');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = Math.random() * 5 + 's';
+            sky.appendChild(star);
+        }
+
+        // --- Ambience Toggle ---
+        let ambienceOn = true;
+        function toggleAmbience() {
+            ambienceOn = !ambienceOn;
+            const toggle = document.getElementById('ambienceToggle');
+            const stars = document.querySelectorAll('.star');
+            const waves = document.querySelector('.waves');
+            
+            if (ambienceOn) {
+                toggle.innerText = 'ambience: on';
+                stars.forEach(s => s.style.display = 'block');
+                waves.style.display = 'block';
+            } else {
+                toggle.innerText = 'ambience: off';
+                stars.forEach(s => s.style.display = 'none');
+                waves.style.display = 'none';
+            }
+        }
+
+        // --- Intersection Observer for Sections ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- Letter Logic ---
+        const letterText = `just for a moment.
+
+hey, ara.
+slow down for a bit,
+u’re safe here.
+
+aku tahu isi kepalamu seringkali terlalu berisik.
+kadang rasanya kayak ombak yang ga pernah benar-benar tenang—
+datang, pergi, balik lagi…
+selalu ada yang harus dipikirkan, selalu ada yang harus dijaga,
+selalu ada hal kecil yang kamu tahan sendirian
+biar semuanya terlihat baik-baik aja.
+
+“it must be tiring to be so strong all the time.”
+
+tapi di tanggal ini, aku pengin kamu inget satu hal:
+kamu ga perlu menang dulu baru boleh istirahat.
+kamu ga perlu “selesai” dulu baru layak dirayakan.
+kamu ga perlu keliatan kuat terus
+buat tetap pantas dicintai.
+
+kalau ada bagian dari dirimu yang lagi lelah,
+biarin dia duduk sebentar.
+ga apa-apa kalau langkahmu melambat.
+ga apa-apa kalau kamu ga punya jawaban cepat.
+di sini, ga ada yang nuntut kamu jadi apa-apa—
+cuma ada ruang kecil yang bilang:
+“aku ada, dan kamu aman.”
+
+december 17, 2025
+
+happy birthday, ara.
+semoga tanggal ini terasa kayak narik napas panjang
+setelah terlalu lama kamu nahan semuanya sendirian.
+semoga kamu diberi jeda yang lembut,
+yang ga bikin kamu harus jelasin apa pun ke siapa pun.
+
+semoga kamu bisa ngerasa dicukupkan—
+bukan karena kamu berhasil melakukan banyak hal,
+tapi karena kamu adalah kamu.
+dengan semua lembutmu, semua ribut di kepalamu,
+semua usaha kecil yang ga pernah kamu pamerin,
+dan semua keberanian yang sering kamu anggap biasa.
+
+kalau kamu pernah ngerasa kecil,
+aku mau kamu tahu:
+kecil bukan berarti ga berarti.
+kadang yang paling berharga justru yang paling sunyi.`;
+
+        let letterIndex = 0;
+        let isTyping = false;
+        let typingTimer;
+
+        function openLetter() {
+            document.getElementById('letter-section').style.display = 'flex';
+            document.getElementById('full-letter').style.display = 'block';
+            window.scrollTo({
+                top: document.getElementById('letter-section').offsetTop,
+                behavior: 'smooth'
+            });
+            startTypewriter();
+        }
+
+        function startTypewriter() {
+            if (isTyping) return;
+            isTyping = true;
+            letterIndex = 0;
+            const container = document.getElementById('typewriter');
+            container.innerText = "";
+            
+            function type() {
+                if (letterIndex < letterText.length) {
+                    container.innerText += letterText.charAt(letterIndex);
+                    letterIndex++;
+                    typingTimer = setTimeout(type, 30);
+                } else {
+                    isTyping = false;
+                    document.getElementById('skipBtn').style.display = 'none';
+                }
+            }
+            type();
+        }
+
+        function skipTypewriter() {
+            clearTimeout(typingTimer);
+            document.getElementById('typewriter').innerText = letterText;
+            isTyping = false;
+            document.getElementById('skipBtn').style.display = 'none';
+        }
+
+        // --- Reminders Logic ---
+        const reminders = [
+            "ga apa-apa kalau hari ini kamu cuma mau diam. dunia ga bakal runtuh cuma karena kamu ambil jeda.",
+            "kamu ga perlu sempurna buat jadi berharga. retakan-retakan itu yang bikin cahayamu unik.",
+            "satu langkah kecil tetep sebuah kemajuan. jangan bandingin kecepatanmu sama orang lain.",
+            "apa pun yang kamu rasain sekarang, itu valid. jangan pernah minta maaf buat perasaanmu sendiri.",
+            "di tengah semua ribut di kepalamu, inget kalau ada aku yang selalu siap dengerin tanpa ngehakimi.",
+            "tarik napas pelan... kamu udah ngelakuin yang terbaik. istirahat ya?"
+        ];
+
+        function showReminder(idx) {
+            document.getElementById('modal-text').innerText = reminders[idx];
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // --- Confetti Logic ---
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function sendWish() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    size: Math.random() * 8 + 4,
+                    color: `rgba(176, 125, 98, ${Math.random() * 0.5 + 0.5})`,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    life: 100
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.life > 0);
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1; // gravity
+                p.life -= 1;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                // Draw heart shape
+                const topCurveHeight = p.size * 0.3;
+                ctx.moveTo(p.x, p.y + topCurveHeight);
+                ctx.bezierCurveTo(p.x, p.y, p.x - p.size / 2, p.y, p.x - p.size / 2, p.y + topCurveHeight);
+                ctx.bezierCurveTo(p.x - p.size / 2, p.y + (p.size + topCurveHeight) / 2, p.x, p.y + (p.size + topCurveHeight) / 2, p.x, p.y + p.size);
+                ctx.bezierCurveTo(p.x, p.y + (p.size + topCurveHeight) / 2, p.x + p.size / 2, p.y + (p.size + topCurveHeight) / 2, p.x + p.size / 2, p.y + topCurveHeight);
+                ctx.bezierCurveTo(p.x + p.size / 2, p.y, p.x, p.y, p.x, p.y + topCurveHeight);
+                ctx.fill();
+            });
+
+            if (particles.length > 0) {
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
